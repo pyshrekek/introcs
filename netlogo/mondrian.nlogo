@@ -4,17 +4,17 @@ to setup
   ask patches [set pcolor white]
 end
 
-to rectangle [x y w h c]
+to mondrian-rectangle [x y w h c]
   ask patches with [(pxcor > x) and (pxcor < (w + x)) and (pycor < y) and (pycor > (y - h))]
   [set pcolor c]
   ; rltb border
-  borderless-rectangle (x - 5) (y + 5) 5 (h + 10) black
-  borderless-rectangle (x + w) (y + 5) 5 (h + 10) black
-  borderless-rectangle x (y + 5) w 5 black
-  borderless-rectangle x (y - h) w 5 black
+  rectangle (x - 5) (y + 5) 5 (h + 10) black
+  rectangle (x + w) (y + 5) 5 (h + 10) black
+  rectangle x (y + 5) w 5 black
+  rectangle x (y - h) w 5 black
 end
 
-to borderless-rectangle [x y w h c]
+to rectangle [x y w h c]
   ask patches with [(pxcor >= x) and (pxcor <= (w + x)) and (pycor <= y) and (pycor >= (y - h))]
   [set pcolor c]
 end
@@ -22,36 +22,36 @@ end
 to painting
   setup
   ; blue
-  rectangle 5 595 100 150 blue
-  rectangle 110 345 600 55 blue
-  rectangle 350 200 50 600 blue
+  mondrian-rectangle 5 595 100 150 blue
+  mondrian-rectangle 110 345 600 55 blue
+  mondrian-rectangle 350 200 50 600 blue
   ; red
-  rectangle 5 105 150 100 red
-  rectangle 5 390 100 100 red
-  rectangle 250 285 50 600 red
+  mondrian-rectangle 5 105 150 100 red
+  mondrian-rectangle 5 390 100 100 red
+  mondrian-rectangle 250 285 50 600 red
   ; yellow
-  rectangle 110 595 320 105 yellow
-  rectangle 110 440 355 90 yellow
-  rectangle 50 285 105 175 yellow
-  rectangle 305 285 95 80 yellow
+  mondrian-rectangle 110 595 320 105 yellow
+  mondrian-rectangle 110 440 355 90 yellow
+  mondrian-rectangle 50 285 105 175 yellow
+  mondrian-rectangle 305 285 95 80 yellow
   ; amogus
-  rectangle 470 595 130 150 red
-  rectangle 435 550 30 60 red
-  rectangle 520 550 80 50 87
-  borderless-rectangle 550 540 40 20 89
-  rectangle 470 440 40 50 red
-  rectangle 555 440 40 50 red
+  mondrian-rectangle 470 595 130 150 red
+  mondrian-rectangle 435 550 30 60 red
+  mondrian-rectangle 520 550 80 50 87
+  rectangle 550 540 40 20 89
+  mondrian-rectangle 470 440 40 50 red
+  mondrian-rectangle 555 440 40 50 red
 
 
 
   ; black lines
-  borderless-rectangle 300 205 max-pxcor 5 black
+  rectangle 300 205 max-pxcor 5 black
 
   ; R L T B bounds
-  borderless-rectangle (max-pxcor - 5) max-pycor 5 max-pycor black
-  borderless-rectangle min-pxcor max-pycor 5 max-pycor black
-  borderless-rectangle min-pxcor max-pycor max-pxcor 5 black
-  borderless-rectangle min-pxcor (min-pycor + 5) max-pxcor 5 black
+  rectangle (max-pxcor - 5) max-pycor 5 max-pycor black
+  rectangle min-pxcor max-pycor 5 max-pycor black
+  rectangle min-pxcor max-pycor max-pxcor 5 black
+  rectangle min-pxcor (min-pycor + 5) max-pxcor 5 black
 end
 
 
@@ -64,15 +64,15 @@ to loopy [espanol next-espanol]
 
   ; colors
   let colorz [white blue red yellow]
-  let randomcolor one-of colorz
+
 
   loop [
-    rectangle leftx espanol (random 600) (espanol - next-espanol - 5) randomcolor
+    let randomcolor one-of colorz
+    mondrian-rectangle leftx espanol (random 600) (espanol - next-espanol - 5) randomcolor
 
     if iterations = sections [stop]
     set colorz remove randomcolor colorz
     if empty? colorz [set colorz [white blue red yellow]]
-    set randomcolor one-of colorz
     set colorz insert-item 0 colorz white
     set leftx leftx + (random 100)
     set iterations iterations + 1
@@ -95,10 +95,28 @@ to randomize
   loopy cuatro cinco
   loopy cinco seis
 
-  borderless-rectangle (max-pxcor - 5) max-pycor 5 max-pycor black
-  borderless-rectangle min-pxcor max-pycor 5 max-pycor black
-  borderless-rectangle min-pxcor max-pycor max-pxcor 5 black
-  borderless-rectangle min-pxcor (min-pycor + 5) max-pxcor 5 black
+  rectangle (max-pxcor - 5) max-pycor 5 max-pycor black
+  rectangle min-pxcor max-pycor 5 max-pycor black
+  rectangle min-pxcor max-pycor max-pxcor 5 black
+  rectangle min-pxcor (min-pycor + 5) max-pxcor 5 black
+end
+
+to draw [x y w h]
+  if (w * h) < threshold [
+    mondrian-rectangle x y w h (one-of [white blue red yellow])
+    stop
+  ]
+  ifelse w > h [
+    let bruh x + random w
+    (draw x y bruh h)
+    (draw (x + bruh) y (w - bruh) h)
+  ]
+  [
+    let bro random y - random h
+    (draw x y bro h)
+    (draw x y w bro)
+    stop
+  ]
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
@@ -193,6 +211,38 @@ sections
 1
 NIL
 HORIZONTAL
+
+SLIDER
+31
+351
+203
+384
+threshold
+threshold
+6000
+36000
+35620.0
+10
+1
+NIL
+HORIZONTAL
+
+BUTTON
+66
+266
+132
+299
+NIL
+draw
+NIL
+1
+T
+OBSERVER
+NIL
+D
+NIL
+NIL
+1
 
 @#$#@#$#@
 ## WHAT IS IT?
@@ -519,7 +569,7 @@ false
 Polygon -7500403 true true 270 75 225 30 30 225 75 270
 Polygon -7500403 true true 30 75 75 30 270 225 225 270
 @#$#@#$#@
-NetLogo 6.2.2
+NetLogo 6.2.0
 @#$#@#$#@
 @#$#@#$#@
 @#$#@#$#@
