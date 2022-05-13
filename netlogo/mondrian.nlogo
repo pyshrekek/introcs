@@ -8,57 +8,97 @@ to rectangle [x y w h c]
   ask patches with [(pxcor > x) and (pxcor < (w + x)) and (pycor < y) and (pycor > (y - h))]
   [set pcolor c]
   ; rltb border
-  rectangle-b (x - 5) (y + 5) 5 (h + 10) black
-  rectangle-b (x + w) (y + 5) 5 (h + 10) black
-  rectangle-b x (y + 5) w 5 black
-  rectangle-b x (y - h) w 5 black
+  borderless-rectangle (x - 5) (y + 5) 5 (h + 10) black
+  borderless-rectangle (x + w) (y + 5) 5 (h + 10) black
+  borderless-rectangle x (y + 5) w 5 black
+  borderless-rectangle x (y - h) w 5 black
 end
 
-to rectangle-b [x y w h c]
+to borderless-rectangle [x y w h c]
   ask patches with [(pxcor >= x) and (pxcor <= (w + x)) and (pycor <= y) and (pycor >= (y - h))]
   [set pcolor c]
 end
 
 to painting
+  setup
   ; blue
   rectangle 5 595 100 150 blue
+  rectangle 110 345 600 55 blue
+  rectangle 350 200 50 600 blue
   ; red
   rectangle 5 105 150 100 red
-  rectangle 5
+  rectangle 5 390 100 100 red
+  rectangle 250 285 50 600 red
   ; yellow
-  rectangle 110 600 320 110 yellow
+  rectangle 110 595 320 105 yellow
   rectangle 110 440 355 90 yellow
+  rectangle 50 285 105 175 yellow
+  rectangle 305 285 95 80 yellow
   ; amogus
   rectangle 470 595 130 150 red
   rectangle 435 550 30 60 red
   rectangle 520 550 80 50 87
-  rectangle-b 550 540 40 20 89
+  borderless-rectangle 550 540 40 20 89
   rectangle 470 440 40 50 red
   rectangle 555 440 40 50 red
 
 
 
   ; black lines
-  ;rectangle-b min-pxcor 445 max-pxcor 5 black
-  ;rectangle-b 105 max-pycor 5 495 black
+  borderless-rectangle 300 205 max-pxcor 5 black
 
   ; R L T B bounds
-  rectangle-b (max-pxcor - 5) max-pycor 5 max-pycor black
-  rectangle-b min-pxcor max-pycor 5 max-pycor black
-  rectangle-b min-pxcor max-pycor max-pxcor 5 black
-  rectangle-b min-pxcor (min-pycor + 5) max-pxcor 5 black
+  borderless-rectangle (max-pxcor - 5) max-pycor 5 max-pycor black
+  borderless-rectangle min-pxcor max-pycor 5 max-pycor black
+  borderless-rectangle min-pxcor max-pycor max-pxcor 5 black
+  borderless-rectangle min-pxcor (min-pycor + 5) max-pxcor 5 black
 end
 
-to bruh
-  rectangle (random 600) (random 600) (random 600) (random 600) yellow
-  rectangle (random 600) (random 600) (random 600) (random 600) red
-  rectangle (random 600) (random 600) (random 600) (random 600) blue
 
+;; RANDOMIZER
+to loopy [espanol next-espanol]
+  let iterations 0
 
-  rectangle-b (max-pxcor - 5) max-pycor 5 max-pycor black
-  rectangle-b min-pxcor max-pycor 5 max-pycor black
-  rectangle-b min-pxcor max-pycor max-pxcor 5 black
-  rectangle-b min-pxcor (min-pycor + 5) max-pxcor 5 black
+  ; x position
+  let leftx 0
+
+  ; colors
+  let colorz [white blue red yellow]
+  let randomcolor one-of colorz
+
+  loop [
+    rectangle leftx espanol (random 600) (espanol - next-espanol - 5) randomcolor
+
+    if iterations = sections [stop]
+    set colorz remove randomcolor colorz
+    if empty? colorz [set colorz [white blue red yellow]]
+    set randomcolor one-of colorz
+    set colorz insert-item 0 colorz white
+    set leftx leftx + (random 100)
+    set iterations iterations + 1
+  ]
+end
+
+to randomize
+  let uno 600
+  let dos 400 + random 100
+  let tres 300 + random 100
+  let cuatro 200 + random 100
+  let cinco 100 + random 100
+  let seis 0
+
+  setup
+
+  loopy uno dos
+  loopy dos tres
+  loopy tres cuatro
+  loopy cuatro cinco
+  loopy cinco seis
+
+  borderless-rectangle (max-pxcor - 5) max-pycor 5 max-pycor black
+  borderless-rectangle min-pxcor max-pycor 5 max-pycor black
+  borderless-rectangle min-pxcor max-pycor max-pxcor 5 black
+  borderless-rectangle min-pxcor (min-pycor + 5) max-pxcor 5 black
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
@@ -106,10 +146,10 @@ NIL
 1
 
 BUTTON
-54
-108
-144
+51
+107
 141
+140
 NIL
 painting\n
 NIL
@@ -123,58 +163,56 @@ NIL
 1
 
 BUTTON
-59
-160
-139
-193
+52
+152
+140
+185
 NIL
-bruh
-T
+randomize\n
+NIL
 1
 T
 OBSERVER
 NIL
-B
+S
 NIL
 NIL
 1
 
+SLIDER
+31
+201
+145
+234
+sections
+sections
+0
+15
+5.0
+1
+1
+NIL
+HORIZONTAL
+
 @#$#@#$#@
 ## WHAT IS IT?
 
-(a general understanding of what the model is trying to show or explain)
-
-## HOW IT WORKS
-
-(what rules the agents use to create the overall behavior of the model)
+This is a NetLogo model that creates a painting in the style of the famous artist Mondrian Piet.
 
 ## HOW TO USE IT
 
-(how to use the model, including a description of each of the items in the Interface tab)
-
-## THINGS TO NOTICE
-
-(suggested things for the user to notice while running the model)
+* Click the "setup" button, or the "R" key on your keyboard to create a blank 600x600 canvas.
+* Click the "painting" button, or the "W" key on your keyboard to create a set painting in the style of Mondrian Piet.
+* Click the "randomize" button, or the "S" key on your keyboard to create a randomized painting in the style of Mondrian Piet.
+* The "section" slider allows you to choose the number of sections in each row of the painting (5 - 10 works best)
 
 ## THINGS TO TRY
 
-(suggested things for the user to try to do (move sliders, switches, etc.) with the model)
-
-## EXTENDING THE MODEL
-
-(suggested things to add or change in the Code tab to make the model more complicated, detailed, accurate, etc.)
-
-## NETLOGO FEATURES
-
-(interesting or unusual features of NetLogo that the model uses, particularly in the Code tab; or where workarounds were needed for missing features)
-
-## RELATED MODELS
-
-(models in the NetLogo Models Library and elsewhere which are of related interest)
+Try changing the values of "section", it can create some weird results if it is too high or too low.
 
 ## CREDITS AND REFERENCES
 
-(a reference to the model's URL on the web if it has one, as well as any other necessary credits, citations, and links)
+By Daniel (Haokun) Xu, Period 7
 @#$#@#$#@
 default
 true
