@@ -24,10 +24,10 @@ to painting
   rectangle 5 595 100 150 blue
   ; red
   rectangle 5 105 150 100 red
-  rectangle 5
   ; yellow
   rectangle 110 600 320 110 yellow
   rectangle 110 440 355 90 yellow
+  rectangle 10
   ; amogus
   rectangle 470 595 130 150 red
   rectangle 435 550 30 60 red
