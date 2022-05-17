@@ -72,10 +72,10 @@ ticks
 30.0
 
 SLIDER
-23
-199
-195
-232
+26
+14
+198
+47
 initial-value
 initial-value
 0
@@ -87,10 +87,10 @@ NIL
 HORIZONTAL
 
 BUTTON
-59
-263
-132
-296
+62
+78
+135
+111
 NIL
 setup
 NIL
@@ -104,10 +104,10 @@ NIL
 1
 
 BUTTON
-63
-320
-126
-353
+66
+135
+129
+168
 NIL
 go\n
 T
@@ -121,32 +121,32 @@ NIL
 1
 
 MONITOR
-214
-474
-296
-519
-max-value
+16
+195
+73
+240
+max
 max [value] of patches
 17
 1
 11
 
 MONITOR
-215
-520
-296
-565
-min-value
+17
+241
+74
+286
+min
 min [value] of patches
 17
 1
 11
 
 MONITOR
-214
-572
-276
-617
+16
+293
+78
+338
 median
 median [value] of patches
 17
@@ -154,10 +154,10 @@ median [value] of patches
 11
 
 MONITOR
-214
-622
-280
-667
+16
+343
+82
+388
 mode
 modes [value] of patches
 17
@@ -165,10 +165,10 @@ modes [value] of patches
 11
 
 MONITOR
-324
-478
-393
-523
+88
+195
+190
+240
 variance
 variance [value] of patches
 17
@@ -176,10 +176,10 @@ variance [value] of patches
 11
 
 MONITOR
-323
-535
-458
-580
+88
+242
+190
+287
 standard-deviation
 standard-deviation [value] of patches
 17
@@ -187,10 +187,10 @@ standard-deviation [value] of patches
 11
 
 MONITOR
-326
-598
-431
-643
+88
+293
+193
+338
 existing-funds
 count patches with [value > 0]
 17
@@ -198,10 +198,10 @@ count patches with [value > 0]
 11
 
 MONITOR
-328
-658
-411
-703
+90
+344
+173
+389
 bust-funds
 count patches with [value <= 0]
 17
@@ -209,15 +209,51 @@ count patches with [value <= 0]
 11
 
 MONITOR
-502
-480
-559
-525
+59
+393
+116
+438
 NIL
 ticks
 17
 1
 11
+
+PLOT
+22
+458
+222
+608
+mean
+ticks
+avg value
+0.0
+10.0
+0.0
+10.0
+true
+false
+"" "plot mean [value] of patches"
+PENS
+"pen-0" 1.0 0 -16777216 true "" "plot count turtles"
+
+PLOT
+225
+458
+425
+608
+variance
+ticks
+variance
+0.0
+10.0
+0.0
+10.0
+true
+false
+"" "plot variance [value] of patches"
+PENS
+"pen-0" 1.0 0 -16777216 true "" "plot count turtles"
 
 @#$#@#$#@
 ## WHAT IS IT?
