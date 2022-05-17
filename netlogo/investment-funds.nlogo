@@ -1,132 +1,57 @@
+patches-own [
+  value
+]
+
 to setup
-  resize-world 0 600 0 600
-  set-patch-size 1
-  ask patches [set pcolor white]
+  ca
+  set-patch-size 25
+  setup-funds
+  reset-ticks
 end
 
-to mondrian-rectangle [x y w h c]
-  ask patches with [(pxcor > x) and (pxcor < (w + x)) and (pycor < y) and (pycor > (y - h))]
-  [set pcolor c]
-  ; rltb border
-  rectangle (x - 5) (y + 5) 5 (h + 10) black
-  rectangle (x + w) (y + 5) 5 (h + 10) black
-  rectangle x (y + 5) w 5 black
-  rectangle x (y - h) w 5 black
-end
-
-to rectangle [x y w h c]
-  ask patches with [(pxcor >= x) and (pxcor <= (w + x)) and (pycor <= y) and (pycor >= (y - h))]
-  [set pcolor c]
-end
-
-to painting
-  setup
-  ; blue
-  mondrian-rectangle 5 595 100 150 blue
-  mondrian-rectangle 110 345 600 55 blue
-  mondrian-rectangle 350 200 50 600 blue
-  ; red
-  mondrian-rectangle 5 105 150 100 red
-  mondrian-rectangle 5 390 100 100 red
-  mondrian-rectangle 250 285 50 600 red
-  ; yellow
-  mondrian-rectangle 110 595 320 105 yellow
-  mondrian-rectangle 110 440 355 90 yellow
-  mondrian-rectangle 50 285 105 175 yellow
-  mondrian-rectangle 305 285 95 80 yellow
-  ; amogus
-  mondrian-rectangle 470 595 130 150 red
-  mondrian-rectangle 435 550 30 60 red
-  mondrian-rectangle 520 550 80 50 87
-  rectangle 550 540 40 20 89
-  mondrian-rectangle 470 440 40 50 red
-  mondrian-rectangle 555 440 40 50 red
-
-
-
-  ; black lines
-  rectangle 300 205 max-pxcor 5 black
-
-  ; R L T B bounds
-  rectangle (max-pxcor - 5) max-pycor 5 max-pycor black
-  rectangle min-pxcor max-pycor 5 max-pycor black
-  rectangle min-pxcor max-pycor max-pxcor 5 black
-  rectangle min-pxcor (min-pycor + 5) max-pxcor 5 black
-end
-
-
-;; RANDOMIZER
-to loopy [espanol next-espanol]
-  let iterations 0
-
-  ; x position
-  let leftx 0
-
-  ; colors
-  let colorz [white blue red yellow]
-
-
-  loop [
-    let randomcolor one-of colorz
-    mondrian-rectangle leftx espanol (random 600) (espanol - next-espanol - 5) randomcolor
-
-    if iterations = sections [stop]
-    set colorz remove randomcolor colorz
-    if empty? colorz [set colorz [white blue red yellow]]
-    set colorz insert-item 0 colorz white
-    set leftx leftx + (random 100)
-    set iterations iterations + 1
-  ]
-end
-
-to randomize
-  let uno 600
-  let dos 400 + random 100
-  let tres 300 + random 100
-  let cuatro 200 + random 100
-  let cinco 100 + random 100
-  let seis 0
-
-  setup
-
-  loopy uno dos
-  loopy dos tres
-  loopy tres cuatro
-  loopy cuatro cinco
-  loopy cinco seis
-
-  rectangle (max-pxcor - 5) max-pycor 5 max-pycor black
-  rectangle min-pxcor max-pycor 5 max-pycor black
-  rectangle min-pxcor max-pycor max-pxcor 5 black
-  rectangle min-pxcor (min-pycor + 5) max-pxcor 5 black
-end
-
-to draw [x y w h]
-  if (w * h) < threshold [
-    mondrian-rectangle x y w h (one-of [white blue red yellow])
-    stop
-  ]
-  ifelse w > h [
-    let bruh x + random w
-    (draw x y bruh h)
-    (draw bruh y (w - bruh) h)
-  ]
+to setup-funds
+  ask patches
   [
-    let bro y - random h
-    (draw x y w bro)
-    (draw x bro w (y - bro))
-    stop
+    set value initial-value
+    set plabel value
   ]
+end
+
+to update-funds
+  ask patches with [value > 0]
+  [
+    set value (value + (one-of [-1 1]))
+  ]
+end
+
+to update-display
+  ask patches with [value <= 0]
+  [
+    set plabel ""
+  ]
+  ask patches with [value > 0]
+  [
+    set plabel value
+  ]
+  watch (max-one-of patches [value])
+  tick
+end
+
+;; Observer
+;; The Driver
+to go
+  update-funds
+  update-display
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
 210
 10
-819
-620
+643
+444
 -1
 -1
-1.0
+25.0
 1
 10
 1
@@ -136,23 +61,38 @@ GRAPHICS-WINDOW
 1
 1
 1
-0
-600
-0
-600
+-8
+8
+-8
+8
 0
 0
 1
 ticks
 30.0
 
-BUTTON
-51
-64
-124
-97
+SLIDER
+23
+199
+195
+232
+initial-value
+initial-value
+0
+100
+25.0
+1
+1
 NIL
-setup\n
+HORIZONTAL
+
+BUTTON
+59
+263
+132
+296
+NIL
+setup
 NIL
 1
 T
@@ -164,105 +104,157 @@ NIL
 1
 
 BUTTON
-51
-107
-141
-140
+63
+320
+126
+353
 NIL
-painting\n
-NIL
+go\n
+T
 1
 T
 OBSERVER
 NIL
-W
+G
 NIL
 NIL
 1
 
-BUTTON
-52
-152
-140
-185
-NIL
-randomize\n
-NIL
+MONITOR
+214
+474
+296
+519
+max-value
+max [value] of patches
+17
 1
-T
-OBSERVER
-NIL
-S
-NIL
-NIL
-1
+11
 
-SLIDER
-31
-201
-145
-234
-sections
-sections
-0
-15
-5.0
+MONITOR
+215
+520
+296
+565
+min-value
+min [value] of patches
+17
 1
-1
-NIL
-HORIZONTAL
+11
 
-SLIDER
-31
-351
-203
-384
-threshold
-threshold
-6000
-36000
-6000.0
-10
+MONITOR
+214
+572
+276
+617
+median
+median [value] of patches
+17
 1
-NIL
-HORIZONTAL
+11
 
-BUTTON
-66
-266
-132
-299
-NIL
-draw
-NIL
+MONITOR
+214
+622
+280
+667
+mode
+modes [value] of patches
+17
 1
-T
-OBSERVER
-NIL
-D
-NIL
-NIL
+11
+
+MONITOR
+324
+478
+393
+523
+variance
+variance [value] of patches
+17
 1
+11
+
+MONITOR
+323
+535
+458
+580
+standard-deviation
+standard-deviation [value] of patches
+17
+1
+11
+
+MONITOR
+326
+598
+431
+643
+existing-funds
+count patches with [value > 0]
+17
+1
+11
+
+MONITOR
+328
+658
+411
+703
+bust-funds
+count patches with [value <= 0]
+17
+1
+11
+
+MONITOR
+502
+480
+559
+525
+NIL
+ticks
+17
+1
+11
 
 @#$#@#$#@
 ## WHAT IS IT?
 
-This is a NetLogo model that creates a painting in the style of the famous artist Mondrian Piet.
+(a general understanding of what the model is trying to show or explain)
+
+## HOW IT WORKS
+
+(what rules the agents use to create the overall behavior of the model)
 
 ## HOW TO USE IT
 
-* Click the "setup" button, or the "R" key on your keyboard to create a blank 600x600 canvas.
-* Click the "painting" button, or the "W" key on your keyboard to create a set painting in the style of Mondrian Piet.
-* Click the "randomize" button, or the "S" key on your keyboard to create a randomized painting in the style of Mondrian Piet.
-* The "section" slider allows you to choose the number of sections in each row of the painting (5 - 10 works best)
+(how to use the model, including a description of each of the items in the Interface tab)
+
+## THINGS TO NOTICE
+
+(suggested things for the user to notice while running the model)
 
 ## THINGS TO TRY
 
-Try changing the values of "section", it can create some weird results if it is too high or too low.
+(suggested things for the user to try to do (move sliders, switches, etc.) with the model)
+
+## EXTENDING THE MODEL
+
+(suggested things to add or change in the Code tab to make the model more complicated, detailed, accurate, etc.)
+
+## NETLOGO FEATURES
+
+(interesting or unusual features of NetLogo that the model uses, particularly in the Code tab; or where workarounds were needed for missing features)
+
+## RELATED MODELS
+
+(models in the NetLogo Models Library and elsewhere which are of related interest)
 
 ## CREDITS AND REFERENCES
 
-By Daniel (Haokun) Xu, Period 7
+(a reference to the model's URL on the web if it has one, as well as any other necessary credits, citations, and links)
 @#$#@#$#@
 default
 true
