@@ -1,3 +1,7 @@
+globals [
+  iter-draw
+]
+
 to setup
   resize-world 0 600 0 600
   set-patch-size 1
@@ -101,20 +105,37 @@ to randomize
   rectangle min-pxcor (min-pycor + 5) max-pxcor 5 black
 end
 
+
+;; improved randomize
+to randomize-draw
+  set iter-draw 0
+  draw 5 595 590 590
+  rectangle (max-pxcor - 5) max-pycor 5 max-pycor black
+  rectangle min-pxcor max-pycor 5 max-pycor black
+  rectangle min-pxcor max-pycor max-pxcor 5 black
+  rectangle min-pxcor (min-pycor + 5) max-pxcor 5 black
+end
+
 to draw [x y w h]
+  if iter-draw = 50 [
+    stop
+  ]
   if (w * h) < threshold [
     mondrian-rectangle x y w h (one-of [white blue red yellow])
+    set iter-draw iter-draw + 1
     stop
   ]
   ifelse w > h [
-    let bruh x + random w
-    (draw x y bruh h)
-    (draw bruh y (w - bruh) h)
+    let randomx x + random w
+
+    (draw x y randomx h)
+    (draw (x + randomx + 5) y (x + randomx) h)
   ]
   [
-    let bro y - random h
-    (draw x y w bro)
-    (draw x bro w (y - bro))
+    let randomy (y - h) + random h
+
+    (draw x y w randomy)
+    (draw x (y - randomy - 5) w (y - randomy))
     stop
   ]
 end
@@ -199,21 +220,6 @@ NIL
 
 SLIDER
 31
-201
-145
-234
-sections
-sections
-0
-15
-5.0
-1
-1
-NIL
-HORIZONTAL
-
-SLIDER
-31
 351
 203
 384
@@ -221,19 +227,19 @@ threshold
 threshold
 6000
 36000
-6000.0
+18420.0
 10
 1
 NIL
 HORIZONTAL
 
 BUTTON
-66
-266
-132
-299
+31
+312
+174
+345
 NIL
-draw
+randomize-draw\n
 NIL
 1
 T
@@ -243,6 +249,21 @@ D
 NIL
 NIL
 1
+
+SLIDER
+52
+188
+146
+221
+sections
+sections
+0
+15
+6.0
+1
+1
+NIL
+HORIZONTAL
 
 @#$#@#$#@
 ## WHAT IS IT?
@@ -255,6 +276,7 @@ This is a NetLogo model that creates a painting in the style of the famous artis
 * Click the "painting" button, or the "W" key on your keyboard to create a set painting in the style of Mondrian Piet.
 * Click the "randomize" button, or the "S" key on your keyboard to create a randomized painting in the style of Mondrian Piet.
 * The "section" slider allows you to choose the number of sections in each row of the painting (5 - 10 works best)
+* **THE "randomize-draw" BUTTON IS EXPERIMENTAL**
 
 ## THINGS TO TRY
 
