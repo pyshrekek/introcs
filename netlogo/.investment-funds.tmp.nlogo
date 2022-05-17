@@ -104,7 +104,7 @@ initial-value
 initial-value
 0
 100
-68.0
+100.0
 1
 1
 NIL
@@ -276,9 +276,9 @@ variance
 10.0
 true
 false
-"" ""
+"" "plot variance [value] of patches"
 PENS
-"variance" 1.0 0 -16777216 true "" "plot variance [value] of patches"
+"pen-0" 1.0 0 -16777216 true "" "plot count turtles"
 
 MONITOR
 16
