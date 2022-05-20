@@ -1,81 +1,80 @@
-patches-own [
-  value
+patches-own
+[
+  color1-neighbors
+  color2-neighbors
 ]
 
 to setup
   ca
-  set-patch-size 25
-  setup-funds
-  reset-ticks
-end
-
-to setup-funds
-  ask patches
-  [
-    set value initial-value
-    set plabel value
-  ]
-end
-
-to update-funds
-  ask patches with [value > 0]
-  [
-    set value (value + (one-of [-1 1]))
-  ]
-end
-
-to update-display
-  ask patches with [value <= 0]
-  [
-    set plabel ""
-  ]
-  ask patches with [value > 0]
-  [
-    set plabel value
-  ]
-  highlight-max
-  tick
-end
-
-to yellow-zone
-  ask patches with [value > 0 and value < 10]
-  [
-    set pcolor yellow
-  ]
-  ask patches with [value >= 10]
-  [
-    set pcolor black
-  ]
-end
-
-to almost-bust
-  ask patches with [value < 10]
-  [
-    set plabel-color red
-  ]
-end
-
-to highlight-max
-  watch (max-one-of patches [value])
+  resize-world -49 50 -49 50
+  set-patch-size 4
+  ask n-of ((world-width * world-height) / 2) patches [set pcolor color1]
+  ask patches with [not (pcolor = color1)] [set pcolor color2]
 end
 
 ;; Observer
-;; The Driver
 to go
-  update-funds
-  update-display
-  yellow-zone
-  almost-bust
+  count-neighbors
+  transition
+end
+
+to-report get-hood
+  if (hood-style = "Moore")
+  [
+    report neighbors
+  ]
+  if (hood-style = "von Neumann")
+  [
+    report neighbors4
+  ]
+  if (hood-style = "corner")
+  [
+    report patches at-points [[1 1] [-1 1] [-1 -1] [1 -1]]
+  ]
+  if (hood-style = "radius")
+  [
+    report patches in-radius check-radius
+  ]
+end
+
+;; Observer
+;; postcondition: The properties are updated with the respective
+;; population size based on a Moore neighborhood
+to count-neighbors
+  ask patches
+  [
+    set color1-neighbors (count get-hood with [pcolor = color1])
+    set color2-neighbors (count get-hood with [pcolor = color2])
+  ]
+end
+
+;; Observer
+to transition
+  ask patches
+  [
+    if (color1-neighbors = color2-neighbors)
+    [
+      set pcolor one-of (list color1 color2)
+    ]
+    if (color1-neighbors > color2-neighbors)
+    [
+      set pcolor color1
+    ]
+    if (color1-neighbors < color2-neighbors)
+    [
+      set pcolor color2
+    ]
+  ]
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
-210
+191
 10
-643
-444
+599
+419
 -1
 -1
-25.0
+4.0
 1
 10
 1
@@ -85,36 +84,21 @@ GRAPHICS-WINDOW
 1
 1
 1
--8
-8
--8
-8
+-49
+50
+-49
+50
 0
 0
 1
 ticks
 30.0
 
-SLIDER
-26
-14
-198
-47
-initial-value
-initial-value
-0
-100
-100.0
-1
-1
-NIL
-HORIZONTAL
-
 BUTTON
-62
-78
-135
-111
+58
+21
+124
+54
 NIL
 setup
 NIL
@@ -127,202 +111,98 @@ NIL
 NIL
 1
 
-BUTTON
-66
-135
-129
-168
+MONITOR
+48
+382
+139
+427
 NIL
-go\n
+count patches
+17
+1
+11
+
+MONITOR
+41
+430
+146
+475
+color1 patches
+count patches with [pcolor = color1]
+17
+1
+11
+
+MONITOR
+41
+477
+146
+522
+color2 patches
+count patches with [pcolor = color2]
+17
+1
+11
+
+INPUTBOX
+41
+114
+137
+174
+color1
+95.0
+1
+0
+Color
+
+INPUTBOX
+43
+179
+138
+239
+color2
+135.0
+1
+0
+Color
+
+BUTTON
+59
+58
+122
+91
+NIL
+go
 T
 1
 T
 OBSERVER
 NIL
-G
+E
 NIL
 NIL
 1
 
-MONITOR
-16
-195
-73
-240
-max
-max [value] of patches
-17
-1
-11
-
-MONITOR
-17
-241
-74
-286
-min
-min [value] of patches
-17
-1
-11
-
-MONITOR
-16
-293
-78
-338
-median
-median [value] of patches
-17
-1
-11
-
-MONITOR
-16
-343
-82
-388
-mode
-modes [value] of patches
-17
-1
-11
-
-MONITOR
-88
-195
-190
-240
-variance
-variance [value] of patches
-17
-1
-11
-
-MONITOR
-88
-242
-190
-287
-standard-deviation
-standard-deviation [value] of patches
-17
-1
-11
-
-MONITOR
-88
-293
-193
-338
-existing-funds
-count patches with [value > 0]
-17
-1
-11
-
-MONITOR
-90
-344
-173
-389
-bust-funds
-count patches with [value <= 0]
-17
-1
-11
-
-MONITOR
-141
-132
-198
-177
-NIL
-ticks
-17
-1
-11
-
-PLOT
-215
-453
-415
-603
-means
-ticks
-avg value
-0.0
-10.0
-0.0
-10.0
-true
-true
-"" ""
-PENS
-"biased" 1.0 0 -11221820 true "" "plot mean [value] of patches"
-"unbiased" 1.0 0 -6917194 true "" "plot ((sum [value] of patches) / (count patches with [value > 0]))"
-
-PLOT
-418
-453
-618
-603
-variance
-ticks
-variance
-0.0
-10.0
-0.0
-10.0
-true
-false
-"" "plot variance [value] of patches"
-PENS
-"pen-0" 1.0 0 -16777216 true "" "plot count turtles"
-
-MONITOR
-16
-391
-136
-436
-initial-total-value
-initial-value * count patches
-17
-1
-11
-
-MONITOR
+CHOOSER
 18
-444
-151
-489
-current-total-value
-sum [value] of patches
-17
-1
-11
+248
+156
+293
+hood-style
+hood-style
+"Moore" "von Neumann" "corner" "radius"
+0
 
-MONITOR
-22
-498
-132
-543
-unbiased-mean
-mean [value] of patches
-17
+INPUTBOX
+14
+305
+163
+365
+check-radius
+3.0
 1
-11
-
-MONITOR
-26
-555
-120
-600
-biased-mean
-(sum [value] of patches) / \n(count patches with [value > 0])
-17
-1
-11
+0
+Number
 
 @#$#@#$#@
 ## WHAT IS IT?
