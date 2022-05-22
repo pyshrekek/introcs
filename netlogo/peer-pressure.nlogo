@@ -52,7 +52,7 @@ end
 to transition
   ask patches
   [
-    if (color1-neighbors = color2-neighbors)
+    if ((color1-neighbors = color2-neighbors) and (equals-condition? = true))
     [
       set pcolor one-of (list color1 color2)
     ]
@@ -191,7 +191,7 @@ CHOOSER
 hood-style
 hood-style
 "Moore" "von Neumann" "corner" "radius"
-0
+2
 
 INPUTBOX
 14
@@ -204,42 +204,57 @@ check-radius
 0
 Number
 
+SWITCH
+193
+441
+362
+474
+equals-condition?
+equals-condition?
+0
+1
+-1000
+
 @#$#@#$#@
 ## WHAT IS IT?
 
-(a general understanding of what the model is trying to show or explain)
-
-## HOW IT WORKS
-
-(what rules the agents use to create the overall behavior of the model)
+This is a NetLogo model that displays the effects of peer pressure. 
+There are patches of two colors, and each patch will change its color to the color that most of its neighbors are. 
 
 ## HOW TO USE IT
 
-(how to use the model, including a description of each of the items in the Interface tab)
+Click *setup* to create a random field of 10,000 patches, 5,000 of *color1* and 5,000 of *color2*
+
+Click *go* to see the magic happen!
+
+*color1* and *color2* define the colors that the patches use in the simulation.	
+
+*hood-style* defines the "neighborhoods" that the patches will check in.
+- *Moore* checks all 8 adjacent patches, using the **neighbors** procedure.
+- *von Neumann* checks only the patches adjacent to the edges of the patch, using the **neighbors4** procedure.
+- *corner* checks only the patches adjacent to the corners of the patch.
+- *radius* checks all the patches within a circular radius of the patch, set using the *check-radius* input on the interface.
+
+*equals-condition?* changes the procedure when the amount of patches of *color1* and *color2* in the checked patches are equal to each other.
+- When *equals-condition?* is set to **on**, the patch will set itself to a random color between *color1* and *color2*.
+- When *equals-condition?* is set to **off**, the patch will do nothing.
+
 
 ## THINGS TO NOTICE
 
-(suggested things for the user to notice while running the model)
+Using the *Moore* condition with *equals-condition* set to **off**, patches will settle down into "blobs" of their own color. There will be approximately equal amounts of both colors, but one will usually be more than the other by 100-200. But when *equals-condition?* is set to **on**, patches will continue to change color and settle down into usually vertical "streaks," or one color will be completely swallowed by the other.
+
+Using the *von Neumann* condition with *equals-condition* set to **on** will create a trippy, alternating checkerboard of colors in some places. A similar effect can be achieved with the *corner* condition.
+
+There are many combinations of conditions to use, each of them producing interesting results.
 
 ## THINGS TO TRY
 
-(suggested things for the user to try to do (move sliders, switches, etc.) with the model)
-
-## EXTENDING THE MODEL
-
-(suggested things to add or change in the Code tab to make the model more complicated, detailed, accurate, etc.)
-
-## NETLOGO FEATURES
-
-(interesting or unusual features of NetLogo that the model uses, particularly in the Code tab; or where workarounds were needed for missing features)
-
-## RELATED MODELS
-
-(models in the NetLogo Models Library and elsewhere which are of related interest)
+Try all the different combinations of conditions!
 
 ## CREDITS AND REFERENCES
 
-(a reference to the model's URL on the web if it has one, as well as any other necessary credits, citations, and links)
+Model by Haokun (Daniel) Xu
 @#$#@#$#@
 default
 true
