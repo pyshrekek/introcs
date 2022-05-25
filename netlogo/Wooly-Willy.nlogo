@@ -16,13 +16,10 @@ end
 to attract
   while [mouse-down?]
   [
-    ask turtles
+    ask turtles with [(distancexy mouse-xcor mouse-ycor) < magnet-strength
     [
-      ask turtles in-radius magnet-strength
-      [
-        facexy mouse-xcor mouse-ycor
-        fd 1
-      ]
+      facexy mouse-xcor mouse-ycor
+      fd 1
     ]
   ]
 end
