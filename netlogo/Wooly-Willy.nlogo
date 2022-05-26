@@ -14,12 +14,15 @@ to setup
 end
 
 to attract
-  while [mouse-down?]
+  if mouse-down?
   [
-    ask turtles with [(distancexy mouse-xcor mouse-ycor) < magnet-strength
+    ask turtles with [(distancexy mouse-xcor mouse-ycor) < magnet-strength]
     [
       facexy mouse-xcor mouse-ycor
-      fd 1
+      if (not any? turtles-on patch-ahead 1)
+      [
+        fd 1
+      ]
     ]
   ]
 end
@@ -108,7 +111,7 @@ CHOOSER
 character
 character
 "willy.jpg" "harriet.jpg" "beagle.jpg" "steven.jpg"
-2
+0
 
 SLIDER
 25
@@ -119,7 +122,7 @@ magnet-strength
 magnet-strength
 0
 100
-17.0
+51.0
 1
 1
 NIL
