@@ -4,13 +4,15 @@ breed [slimes slime]
 
 to setup
   ca
-  resize-world -16 16 -16 16
-  set-patch-size 20
+  reset-ticks
+  resize-world -80 80 -80 80
+  set-patch-size 3
   slime-setup
 end
 
 to slime-setup
-  crt cells [
+  crt cells
+  [
     set breed slimes
     set color yellow
     set shape "square"
@@ -19,20 +21,29 @@ to slime-setup
 end
 
 to go
-  drop-pheromone
+  tick
+  sniff
   slime-move
+  evaporation
+  drop-pheromone
+  diffuse pheromone diffusion-rate
   display-pheromone
 end
 
 to drop-pheromone
-  ask patches with [any? turtles-on self]
+  if (ticks >= drop-rate)
   [
-    set pheromone pheromone + 1
+    ask patches with [any? turtles-on self]
+    [
+      set pheromone pheromone + drop-amount
+    ]
+    reset-ticks
   ]
 end
 
 to slime-move
-  ask slimes [
+  ask slimes
+  [
     lt random 60
     rt random 60
     fd 1
@@ -40,19 +51,45 @@ to slime-move
 end
 
 to display-pheromone
-  ask patches [
+  ask patches
+  [
     set pcolor scale-color green pheromone 0 max-threshold
   ]
 end
+
+to evaporation
+  ask patches [set pheromone (pheromone * (1 - evaporation-rate))]
+end
+
+to sniff
+  ask slimes
+  [
+    if (sniff-type = "uphill")
+    [uphill pheromone]
+    if (sniff-type = "downhill")
+    [downhill pheromone]
+    if (sniff-type = "in-radius")
+    [face (max-one-of (patches in-radius sniff-radius) [pheromone])]
+    if (sniff-type = "in-cone")
+    [face (max-one-of (patches in-cone sniff-radius sniff-angle) [pheromone])]
+    if (sniff-type = "front-back")
+    [
+      ifelse ([pheromone] of patch-ahead 1 >= [pheromone] of patch-ahead -1)
+      [face patch-ahead 1]
+      [face patch-ahead -1]
+    ]
+  ]
+end
+
 @#$#@#$#@
 GRAPHICS-WINDOW
-210
+270
 10
-878
-679
+761
+502
 -1
 -1
-20.0
+3.0
 1
 10
 1
@@ -62,10 +99,10 @@ GRAPHICS-WINDOW
 1
 1
 1
--16
-16
--16
-16
+-80
+80
+-80
+80
 0
 0
 1
@@ -73,25 +110,25 @@ ticks
 30.0
 
 SLIDER
-23
-311
-195
-344
+16
+151
+188
+184
 cells
 cells
 0
 200
-166.0
+200.0
 1
 1
 NIL
 HORIZONTAL
 
 BUTTON
-76
-51
-149
-84
+19
+13
+94
+93
 NIL
 setup
 NIL
@@ -105,13 +142,13 @@ NIL
 1
 
 BUTTON
-69
-111
-132
-144
+96
+12
+178
+93
 NIL
 go
-NIL
+T
 1
 T
 OBSERVER
@@ -122,10 +159,10 @@ NIL
 1
 
 MONITOR
-28
-442
-144
-487
+138
+100
+254
+145
 avg pheromone
 mean [pheromone] of patches
 17
@@ -133,10 +170,10 @@ mean [pheromone] of patches
 11
 
 MONITOR
-26
-393
-146
-438
+16
+100
+136
+145
 max pheromone
 max [pheromone] of patches
 17
@@ -144,18 +181,118 @@ max [pheromone] of patches
 11
 
 SLIDER
-24
-352
-196
-385
+14
+193
+186
+226
 max-threshold
 max-threshold
 0
-5
-5.0
+50
+2.0
 1
 1
 NIL
+HORIZONTAL
+
+SLIDER
+15
+337
+187
+370
+sniff-radius
+sniff-radius
+0
+20
+10.0
+1
+1
+NIL
+HORIZONTAL
+
+CHOOSER
+16
+239
+154
+284
+sniff-type
+sniff-type
+"uphill" "downhill" "in-radius" "in-cone" "front-back"
+4
+
+SLIDER
+15
+293
+187
+326
+sniff-angle
+sniff-angle
+0
+180
+52.0
+1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+16
+432
+259
+465
+diffusion-rate
+diffusion-rate
+0
+1
+1.0
+.01
+1
+NIL
+HORIZONTAL
+
+SLIDER
+13
+389
+261
+422
+evaporation-rate
+evaporation-rate
+0
+1
+0.01
+.01
+1
+/ step
+HORIZONTAL
+
+SLIDER
+13
+479
+264
+512
+drop-amount
+drop-amount
+0
+100
+17.0
+1
+1
+pheromones per drop
+HORIZONTAL
+
+SLIDER
+11
+518
+263
+551
+drop-rate
+drop-rate
+0
+100
+61.0
+1
+1
+steps per drop
 HORIZONTAL
 
 @#$#@#$#@
@@ -500,7 +637,7 @@ false
 Polygon -7500403 true true 270 75 225 30 30 225 75 270
 Polygon -7500403 true true 30 75 75 30 270 225 225 270
 @#$#@#$#@
-NetLogo 6.2.0
+NetLogo 6.2.2
 @#$#@#$#@
 @#$#@#$#@
 @#$#@#$#@
