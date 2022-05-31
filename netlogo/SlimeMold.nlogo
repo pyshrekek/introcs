@@ -1,6 +1,8 @@
 patches-own [pheromone]
+predators-own [hp]
 
 breed [slimes slime]
+breed [predators predator]
 
 to setup
   ca
@@ -8,32 +10,37 @@ to setup
   resize-world -80 80 -80 80
   set-patch-size 3
   slime-setup
-end
-
-to slime-setup
-  crt cells
-  [
-    set breed slimes
-    set color yellow
-    set shape "square"
-    setxy random-xcor random-ycor
-  ]
+  predator-setup
 end
 
 to go
   tick
   sniff
   slime-move
+  predator-decay
+  predator-move
+  predator-kill
   evaporation
   drop-pheromone
   diffuse pheromone diffusion-rate
   display-pheromone
 end
 
+to slime-setup
+  crt slime-count
+  [
+    set breed slimes
+    set color yellow
+    set size 3
+    set shape "square"
+    setxy random-xcor random-ycor
+  ]
+end
+
 to drop-pheromone
   if (ticks >= drop-rate)
   [
-    ask patches with [any? turtles-on self]
+    ask patches with [any? slimes-on self]
     [
       set pheromone pheromone + drop-amount
     ]
@@ -81,6 +88,44 @@ to sniff
   ]
 end
 
+to predator-setup
+  crt predator-count
+  [
+    set breed predators
+    set color red
+    set size 3
+    set shape "bug"
+    setxy random-xcor random-ycor
+    set hp 100
+  ]
+end
+
+to predator-move
+  ask predators
+  [
+    face (max-one-of (patches in-cone 5 60) [pheromone])
+    fd 1
+  ]
+end
+
+to predator-kill
+  ask predators
+  [
+    if any? slimes-here
+    [
+      ask slimes-here [die]
+      set size size + 1
+      set hp hp + 10
+    ]
+  ]
+end
+
+to predator-decay
+  ask predators [
+    set hp hp - ([pheromone] of patch-here) * (.2 + random .6)
+    if (hp <= 0) [die]
+  ]
+end
 @#$#@#$#@
 GRAPHICS-WINDOW
 270
@@ -114,8 +159,8 @@ SLIDER
 151
 188
 184
-cells
-cells
+slime-count
+slime-count
 0
 200
 200.0
@@ -181,10 +226,10 @@ max [pheromone] of patches
 11
 
 SLIDER
-14
-193
-186
-226
+16
+231
+188
+264
 max-threshold
 max-threshold
 0
@@ -196,10 +241,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-15
-337
-187
-370
+17
+375
+189
+408
 sniff-radius
 sniff-radius
 0
@@ -211,20 +256,20 @@ NIL
 HORIZONTAL
 
 CHOOSER
-16
-239
-154
-284
+18
+277
+156
+322
 sniff-type
 sniff-type
 "uphill" "downhill" "in-radius" "in-cone" "front-back"
-4
+2
 
 SLIDER
-15
-293
-187
-326
+17
+331
+189
+364
 sniff-angle
 sniff-angle
 0
@@ -236,10 +281,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-16
-432
-259
-465
+18
+470
+261
+503
 diffusion-rate
 diffusion-rate
 0
@@ -251,10 +296,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-13
-389
-261
-422
+15
+427
+263
+460
 evaporation-rate
 evaporation-rate
 0
@@ -266,34 +311,104 @@ evaporation-rate
 HORIZONTAL
 
 SLIDER
-13
-479
-264
-512
+15
+517
+266
+550
 drop-amount
 drop-amount
 0
 100
-17.0
+8.0
 1
 1
 pheromones per drop
 HORIZONTAL
 
 SLIDER
-11
-518
-263
-551
+13
+556
+265
+589
 drop-rate
 drop-rate
 0
 100
-61.0
+1.0
 1
 1
 steps per drop
 HORIZONTAL
+
+SLIDER
+17
+190
+189
+223
+predator-count
+predator-count
+0
+40
+16.0
+1
+1
+NIL
+HORIZONTAL
+
+MONITOR
+283
+515
+375
+560
+NIL
+count slimes
+17
+1
+11
+
+MONITOR
+384
+515
+486
+560
+max pred. size
+[size] of max-one-of predators [size]
+17
+1
+11
+
+MONITOR
+499
+514
+554
+559
+min hp
+[hp] of min-one-of predators [hp]
+17
+1
+11
+
+MONITOR
+500
+559
+556
+604
+max hp
+[hp] of max-one-of predators [hp]
+17
+1
+11
+
+MONITOR
+283
+567
+396
+612
+NIL
+count predators
+17
+1
+11
 
 @#$#@#$#@
 ## WHAT IS IT?
